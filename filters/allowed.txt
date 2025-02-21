@@ -1,0 +1,4 @@
+gopher
+secret
+helloworld
+admin
