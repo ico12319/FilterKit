@@ -65,3 +65,9 @@ This repository provides a modular, composable filtering system in Go. The main 
 - **Simplicity**: Each package handles a specific part of the filtering logic (loading data, validating strings, etc.), ensuring the code is straightforward to maintain.
 
 
+## Running Tests To run the unit tests for FilterKit, follow these steps: 
+1. **Open your terminal.** 
+2. **Navigate to the project root directory.**: For example, if your project is in `/Users/yourname/FilterKit`, run: bash cd /Users/yourname/FilterKit 
+3. **Run the tests using the Go test command:**: bash go test ./...  This command will search for all files ending with `_test.go` in your project and execute the tests.
+ 4. **Review the test output.** If all tests pass, you'll see output similar to: PASS ok filters/allowed 0.417s
+
