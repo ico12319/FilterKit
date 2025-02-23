@@ -64,6 +64,10 @@ This repository provides a modular, composable filtering system in Go. The main 
 - **Composability**: `IntersectionOfFilters` can combine any number of filters, enabling complex validation rules from simpler building blocks.  
 - **Simplicity**: Each package handles a specific part of the filtering logic (loading data, validating strings, etc.), ensuring the code is straightforward to maintain.
 
+## Mocking with Gomock
+
+This project uses [Gomock](https://github.com/golang/mock) for generating mocks in tests. Gomock is a powerful framework that allows you to create mock implementations of your interfaces and set expectations on method calls, helping to isolate components during testing.
+For more details and advanced usage, refer to the Gomock documentation.
 
 ## Running Tests 
 To run the unit tests for FilterKit, follow these steps: 
