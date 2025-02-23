@@ -1,10 +1,8 @@
 package intersectionOfFilters
 
 import (
-	"filters/allowed"
-	"filters/blocked"
 	"filters/filter"
-	"filters/filterByCriteria"
+	"github.com/golang/mock/gomock"
 	"reflect"
 	"testing"
 )
@@ -18,72 +16,46 @@ func TestNewIntersectionOfFiltersInstance(t *testing.T) {
 }
 
 func TestIntersectionOfFilters_Add(t *testing.T) {
-	allowedStrings := map[string]int{
-		"eyes": 1,
-		"eva":  3,
-	}
-	blockedStrings := map[string]int{
-		"ratatui": 1,
-		"kisa":    2,
-	}
+	controller := gomock.NewController(t)
+	defer controller.Finish()
 
-	allowedInstance := allowed.NewAllowedInstance(allowedStrings)
-	blockedInstance := blocked.NewBlockedInstance(blockedStrings)
+	mockFilter1 := filter.NewMockFilter(controller)
+	mockFilter2 := filter.NewMockFilter(controller)
+	mockFilter3 := filter.NewMockFilter(controller)
+	mockFilters := []filter.Filter{mockFilter1, mockFilter2, mockFilter3}
 
-	filter1 := filterByCriteria.NewFilterByCriteria(allowedInstance)
-	filter2 := filterByCriteria.NewFilterByCriteria(blockedInstance)
+	iF := NewIntersectionOfFiltersInstance()
+	iF.Add(mockFilter1)
+	iF.Add(mockFilter2)
+	iF.Add(mockFilter3)
 
-	filters := []filter.Filter{filter1, filter2}
-
-	intersectionInstance := NewIntersectionOfFiltersInstance()
-	intersectionInstance.Add(filter1)
-	intersectionInstance.Add(filter2)
-
-	if !reflect.DeepEqual(filters, intersectionInstance.Filters) {
-		t.Errorf("Add function not adding filters properly : returned %v, expected %v", intersectionInstance.Filters, filters)
+	if !reflect.DeepEqual(iF.Filters, mockFilters) {
+		t.Errorf("IntersectionOfFilters_Add failed expected %v returned %v", mockFilters, iF.Filters)
 	}
 }
 
 func TestIntersectionOfFilters_Accepts(t *testing.T) {
-	allowedStrings := map[string]int{
-		"okay":   1, // dummy values
-		"no":     2,
-		"bussin": 3,
-		"kicin":  4,
+	controller := gomock.NewController(t)
+	defer controller.Finish()
+
+	mockFilter1 := filter.NewMockFilter(controller)
+	mockFilter2 := filter.NewMockFilter(controller)
+
+	testString1 := "should be accepted"
+	testString2 := "should be rejected"
+	mockFilter1.EXPECT().Accepts(testString1).Return(true).Times(1)
+	mockFilter2.EXPECT().Accepts(testString1).Return(true).Times(1)
+	mockFilter1.EXPECT().Accepts(testString2).Return(true).Times(1)
+	mockFilter2.EXPECT().Accepts(testString2).Return(false).Times(1)
+
+	iF := NewIntersectionOfFiltersInstance()
+	iF.Add(mockFilter1)
+	iF.Add(mockFilter2)
+
+	if !iF.Accepts(testString1) {
+		t.Errorf("Expected %v to be accepted by the filter", testString1)
 	}
-
-	blockedStrings := map[string]int{
-		"grey": 1,
-		"girl": 2,
-		"boy":  3,
-		"okay": 4,
-	}
-
-	testCases := []struct {
-		input    string
-		expected bool
-	}{
-		{"okay", false},
-		{"grey", false},
-		{"girl", false},
-		{"no", true},
-		{"kicin", true},
-	}
-
-	allowedInstance := allowed.NewAllowedInstance(allowedStrings)
-	blockedInstance := blocked.NewBlockedInstance(blockedStrings)
-
-	filter1 := filterByCriteria.NewFilterByCriteria(allowedInstance)
-	filter2 := filterByCriteria.NewFilterByCriteria(blockedInstance)
-
-	intersectionInstance := NewIntersectionOfFiltersInstance()
-	intersectionInstance.Add(filter1)
-	intersectionInstance.Add(filter2)
-
-	for _, tc := range testCases {
-		result := intersectionInstance.Accepts(tc.input)
-		if result != tc.expected {
-			t.Errorf("Accepts(%q) = %v expected %v", tc.input, result, tc.expected)
-		}
+	if iF.Accepts(testString2) {
+		t.Errorf("Expected %v to not be accepted by the filter", testString2)
 	}
 }

@@ -1,4 +1,0 @@
-gopher
-secret
-helloworld
-admin

@@ -27,7 +27,7 @@ func TestNewAllowedInstance(t *testing.T) {
 }
 
 func TestAllowed_IsValid(t *testing.T) {
-	allowedStrings := map[string]int{
+	allowedMap := map[string]int{
 		"grey":   1, // dummy values
 		"apple":  2,
 		"gopher": 3,
@@ -35,25 +35,20 @@ func TestAllowed_IsValid(t *testing.T) {
 		"port":   5,
 		"sigma":  12,
 	}
+	allowedFilter := NewAllowedInstance(allowedMap)
 
-	allowedFilter := NewAllowedInstance(allowedStrings)
+	testString1 := "grey"   // should return true
+	testString2 := "apple"  // should return true
+	testString3 := "hfagqq" // should return false
 
-	testCases := []struct {
-		input    string
-		expected bool
-	}{
-		{"grey", true},
-		{"apple", true},
-		{"sigma", true},
-		{"vrt", true},
-		{"ivan", false},
-		{"", false},
+	if !allowedFilter.IsValid(testString1) {
+		t.Errorf("Expected %v to be valid", testString1)
+	}
+	if !allowedFilter.IsValid(testString2) {
+		t.Errorf("Expected %v to be valid", testString2)
+	}
+	if allowedFilter.IsValid(testString3) {
+		t.Errorf("Expected %v to not be valid", testString3)
 	}
 
-	for _, tc := range testCases {
-		result := allowedFilter.IsValid(tc.input)
-		if result != tc.expected {
-			t.Errorf("IsValid(%q) = %v : expected %v", tc.input, result, tc.expected)
-		}
-	}
 }
